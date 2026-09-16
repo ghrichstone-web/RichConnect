@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+frontend/rc_check.js
+frontend/*.backup
+frontend/*.before-*
+backend/*.before-*
+backend/app.local-working.py
+backend/schema.local-working.sql
+richconnect_script_1.js
+temp/
+*.tar.gz
+
+# Local backups / Termux-only files
+frontend/index.local-working.html
+frontend/index.pre-home-redesign.html
+start_richconnect.sh
+frontend/index.backup.html

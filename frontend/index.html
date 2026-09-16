@@ -1,0 +1,3468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RichConnect</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --rc-blue: #1877f2;
+    --rc-blue-dark: #0d65d9;
+    --rc-bg: #f3f5f8;
+    --rc-card: #ffffff;
+    --rc-text: #172033;
+    --rc-muted: #6b7280;
+    --rc-border: #e5e7eb;
+    --rc-hover: #f0f4f9;
+    --rc-green: #22c55e;
+    --rc-shadow: 0 2px 10px rgba(0,0,0,.07);
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--rc-bg);
+    color: var(--rc-text);
+}
+
+/* =========================
+   GLOBAL
+========================= */
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.card {
+    background: var(--rc-card);
+    border: 1px solid var(--rc-border);
+    border-radius: 14px;
+    box-shadow: var(--rc-shadow);
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.rc-topbar {
+    height: 64px;
+    background: #fff;
+    border-bottom: 1px solid var(--rc-border);
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.rc-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 235px;
+}
+
+.rc-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1877f2, #5b9df9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(24,119,242,.25);
+}
+
+.rc-brand-name {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+}
+
+.rc-search {
+    width: min(420px, 35vw);
+    position: relative;
+}
+
+.rc-search input {
+    width: 100%;
+    height: 42px;
+    border: 0;
+    outline: none;
+    background: #f1f3f6;
+    border-radius: 22px;
+    padding: 0 18px 0 43px;
+    color: var(--rc-text);
+}
+
+.rc-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 11px;
+    color: #7b8494;
+}
+
+.rc-top-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.rc-top-btn {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: .2s;
+}
+
+.rc-top-btn:hover {
+    background: #e4e8ee;
+}
+
+.rc-profile-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 9px 4px 5px;
+    border-radius: 22px;
+    background: #f5f6f8;
+}
+
+.rc-profile-mini span {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.rc-layout {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 250px minmax(420px, 680px) 280px;
+    gap: 22px;
+    padding: 22px;
+    align-items: start;
+}
+
+.rc-sidebar,
+.rc-rightbar {
+    position: sticky;
+    top: 86px;
+}
+
+.rc-left-card,
+.rc-right-card {
+    padding: 14px;
+}
+
+/* =========================
+   AVATARS
+========================= */
+
+.rc-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1877f2, #74a9ff);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.rc-avatar.large {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    font-size: 22px;
+}
+
+.rc-avatar.small {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 14px;
+}
+
+/* =========================
+   LEFT NAV
+========================= */
+
+.rc-user-card {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px;
+    margin-bottom: 10px;
+}
+
+.rc-user-card strong {
+    display: block;
+    font-size: 14px;
+}
+
+.rc-user-card small {
+    color: var(--rc-muted);
+}
+
+.rc-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rc-nav button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 11px 12px;
+    border-radius: 10px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: #344054;
+    font-weight: 600;
+}
+
+.rc-nav button:hover,
+.rc-nav button.active {
+    background: #eaf2ff;
+    color: var(--rc-blue);
+}
+
+.rc-nav-icon {
+    width: 25px;
+    text-align: center;
+    font-size: 19px;
+}
+
+.rc-section-title {
+    font-size: 13px;
+    color: var(--rc-muted);
+    font-weight: 700;
+    padding: 16px 10px 8px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.rc-main {
+    min-width: 0;
+}
+
+.rc-page {
+    width: 100%;
+}
+
+/* =========================
+   STORIES
+========================= */
+
+.rc-stories {
+    padding: 12px;
+    overflow: hidden;
+}
+
+.rc-stories-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.rc-stories-row::-webkit-scrollbar {
+    display: none;
+}
+
+.rc-story {
+    min-width: 105px;
+    height: 155px;
+    border-radius: 13px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, #dbeafe, #8db9ff);
+    border: 1px solid var(--rc-border);
+}
+
+.rc-story.create {
+    background: #fff;
+}
+
+.rc-story-cover {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+}
+
+.rc-story-plus {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--rc-blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.rc-story-name {
+    position: absolute;
+    bottom: 9px;
+    left: 9px;
+    right: 7px;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 1px 4px rgba(0,0,0,.4);
+}
+
+.rc-story.create .rc-story-name {
+    color: var(--rc-text);
+    text-shadow: none;
+    text-align: center;
+}
+
+
+/* RichConnect Stories Polish */
+.rc-story {
+    min-width: 112px !important;
+    height: 168px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,.08);
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.rc-story:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+}
+
+.rc-story .rc-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,.95);
+    color: var(--rc-blue);
+    font-size: 20px;
+    font-weight: 800;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    position: relative;
+    z-index: 2;
+}
+
+.rc-story-name {
+    z-index: 3;
+    bottom: 10px !important;
+    left: 10px !important;
+    font-size: 12px;
+    line-height: 1.2;
+    text-shadow: 0 1px 4px rgba(0,0,0,.55);
+}
+
+.rc-story.create {
+    background: linear-gradient(180deg, #ffffff, #f4f7fb);
+}
+
+/* =========================
+   COMPOSER
+========================= */
+
+.rc-composer {
+    margin-top: 16px;
+    padding: 15px;
+}
+
+.rc-composer-top {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.rc-composer-trigger {
+    flex: 1;
+    border: 0;
+    background: #f0f2f5;
+    border-radius: 23px;
+    height: 44px;
+    text-align: left;
+    padding: 0 17px;
+    color: #7a8494;
+}
+
+.rc-composer textarea {
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+    border: 1px solid var(--rc-border);
+    border-radius: 11px;
+    padding: 12px;
+    margin-top: 12px;
+    outline: none;
+}
+
+.rc-composer-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 11px;
+}
+
+.rc-composer-option {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    padding: 9px;
+    border-radius: 9px;
+    color: #536071;
+    font-weight: 600;
+}
+
+.rc-composer-option:hover {
+    background: #f1f3f6;
+}
+
+.rc-post-button {
+    border: 0;
+    background: var(--rc-blue);
+    color: white;
+    border-radius: 9px;
+    padding: 9px 20px;
+    font-weight: 700;
+}
+
+/* =========================
+   FEED
+========================= */
+
+.rc-feed-card {
+    margin-top: 16px;
+    overflow: hidden;
+}
+
+.rc-feed-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rc-feed-author {
+    flex: 1;
+}
+
+.rc-feed-author strong {
+    display: block;
+    font-size: 14px;
+}
+
+.rc-feed-author small {
+    color: var(--rc-muted);
+    font-size: 12px;
+}
+
+.rc-feed-menu {
+    border: 0;
+    background: transparent;
+    font-size: 20px;
+    padding: 5px 9px;
+    border-radius: 8px;
+}
+
+.rc-feed-menu:hover {
+    background: #f1f3f6;
+}
+
+.rc-feed-content {
+    padding: 0 16px 14px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
+.rc-feed-image {
+    width: 100%;
+    min-height: 230px;
+    background: linear-gradient(135deg, #dbeafe, #eef5ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+}
+
+.rc-feed-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 15px;
+    color: var(--rc-muted);
+    font-size: 13px;
+    border-bottom: 1px solid var(--rc-border);
+}
+
+.rc-feed-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 5px;
+}
+
+.rc-feed-actions button {
+    border: 0;
+    background: transparent;
+    padding: 10px;
+    border-radius: 8px;
+    color: #596579;
+    font-weight: 700;
+}
+
+.rc-feed-actions button:hover {
+    background: #f1f3f6;
+}
+
+/* Existing post classes used by JavaScript */
+.post {
+    margin-top: 0;
+    border: 0;
+    padding: 0;
+}
+
+.post-author {
+    font-weight: 700;
+}
+
+.post-date {
+    color: var(--rc-muted);
+    font-size: 12px;
+}
+
+.post-content {
+    line-height: 1.55;
+    margin: 10px 0;
+}
+
+.actions {
+    display: flex;
+    gap: 5px;
+}
+
+.actions button {
+    flex: 1;
+    background: #f0f2f5;
+    color: #475467;
+}
+
+/* =========================
+   RIGHT BAR
+========================= */
+
+.rc-right-card {
+    margin-bottom: 15px;
+}
+
+.rc-right-title {
+    font-size: 15px;
+    font-weight: 800;
+    padding: 5px 5px 12px;
+}
+
+.rc-contact {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 5px;
+    border-radius: 9px;
+}
+
+.rc-contact:hover {
+    background: #f3f5f8;
+}
+
+.rc-contact-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.rc-contact-info strong {
+    display: block;
+    font-size: 13px;
+}
+
+.rc-online {
+    color: var(--rc-green);
+    font-size: 11px;
+}
+
+.rc-add {
+    border: 0;
+    background: #eaf2ff;
+    color: var(--rc-blue);
+    border-radius: 7px;
+    padding: 6px 9px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   FACEBOOK-STYLE PROFILE
+========================= */
+
+.rc-profile-card {
+    background: #fff;
+    border: 1px solid var(--rc-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+
+.rc-profile-cover {
+    height: 190px;
+    background: linear-gradient(135deg, #1877f2, #5b4de8, #8b5cf6);
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px 24px;
+}
+
+.rc-cover-title {
+    color: rgba(255,255,255,.9);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.rc-profile-identity {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 24px 20px;
+    min-height: 125px;
+}
+
+.rc-profile-avatar {
+    width: 112px;
+    height: 112px;
+    margin-top: -58px;
+    flex: 0 0 112px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    background: var(--rc-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0,0,0,.18);
+}
+
+.rc-profile-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.rc-profile-main h2 {
+    margin: 8px 0 3px;
+    font-size: 27px;
+}
+
+.rc-profile-email {
+    color: #667085;
+    margin: 0;
+    font-size: 14px;
+}
+
+.rc-profile-bio {
+    margin: 9px 0 0;
+    color: #344054;
+    font-size: 14px;
+}
+
+.rc-edit-profile-btn {
+    align-self: flex-start;
+    margin-top: 15px;
+    white-space: nowrap;
+}
+
+.rc-profile-tabs {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #ddd;
+    padding: 0 18px;
+    overflow-x: auto;
+}
+
+.rc-profile-tabs button {
+    border: 0;
+    background: transparent;
+    color: #667085;
+    font-weight: 700;
+    padding: 15px 18px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.rc-profile-tabs button.active {
+    color: var(--rc-blue);
+    border-bottom: 3px solid var(--rc-blue);
+}
+
+.rc-profile-edit {
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+}
+
+.rc-profile-edit h3 {
+    margin: 0 0 15px;
+}
+
+.rc-profile-edit label {
+    display: block;
+    margin: 12px 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #344054;
+}
+
+.rc-profile-edit textarea {
+    min-height: 90px;
+    margin-bottom: 10px;
+}
+
+.rc-profile-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 18px;
+    background: #f5f6f8;
+}
+
+.rc-profile-section {
+    background: #fff;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.rc-profile-section h3 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.rc-profile-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.rc-info-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #eef4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rc-profile-info strong,
+.rc-profile-info small {
+    display: block;
+}
+
+.rc-profile-info small {
+    color: #667085;
+    margin-top: 3px;
+}
+
+.rc-profile-section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.rc-profile-empty {
+    min-height: 170px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #667085;
+    text-align: center;
+}
+
+.rc-profile-empty-icon {
+    font-size: 35px;
+    margin-bottom: 8px;
+}
+
+.rc-profile-empty strong {
+    color: #344054;
+    font-size: 16px;
+}
+
+.rc-profile-empty span {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+@media (max-width: 760px) {
+    .rc-profile-card {
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .rc-profile-cover {
+        height: 145px;
+    }
+
+    .rc-profile-identity {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 0 15px 15px;
+        gap: 10px;
+    }
+
+    .rc-profile-avatar {
+        width: 92px;
+        height: 92px;
+        flex-basis: 92px;
+        font-size: 34px;
+        margin-top: -46px;
+    }
+
+    .rc-profile-main {
+        padding-top: 2px;
+        flex-basis: calc(100% - 105px);
+    }
+
+    .rc-profile-main h2 {
+        font-size: 22px;
+    }
+
+    .rc-edit-profile-btn {
+        width: 100%;
+        margin-top: 3px;
+    }
+
+    .rc-profile-tabs {
+        padding: 0 5px;
+    }
+
+    .rc-profile-tabs button {
+        flex: 1;
+        padding: 13px 8px;
+        font-size: 12px;
+    }
+
+    .rc-profile-content {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+}
+
+/* =========================
+   PROFILE / PEOPLE
+========================= */
+
+.profile-header {
+    text-align: center;
+    padding: 20px;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--rc-blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+input,
+textarea {
+    width: 100%;
+    border: 1px solid var(--rc-border);
+    border-radius: 9px;
+    padding: 11px 12px;
+    outline: none;
+}
+
+input:focus,
+textarea:focus {
+    border-color: var(--rc-blue);
+}
+
+.primary {
+    background: var(--rc-blue);
+    color: white;
+    border: 0;
+    border-radius: 9px;
+    padding: 11px 18px;
+    font-weight: 700;
+}
+
+.secondary {
+    background: #eef1f5;
+    color: #344054;
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 15px;
+    font-weight: 700;
+}
+
+.danger {
+    background: #e53935;
+    color: white;
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 15px;
+}
+
+.user {
+    padding: 12px;
+    border-bottom: 1px solid var(--rc-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 700;
+}
+
+.user-email {
+    color: var(--rc-muted);
+    font-size: 13px;
+}
+
+.empty {
+    text-align: center;
+    color: var(--rc-muted);
+    padding: 30px;
+}
+
+.comment {
+    background: #f0f2f5;
+    padding: 8px 12px;
+    border-radius: 15px;
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+#authSection {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 15px;
+    background: linear-gradient(135deg, #edf5ff, #f8fafc);
+}
+
+.auth-wrap {
+    width: min(430px, 100%);
+}
+
+.auth-brand {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.auth-brand .rc-logo {
+    margin: 0 auto 10px;
+}
+
+.auth-brand h1 {
+    font-size: 28px;
+}
+
+.auth-card {
+    padding: 22px;
+}
+
+.auth-card h2 {
+    margin-bottom: 7px;
+}
+
+.auth-card p {
+    color: var(--rc-muted);
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.auth-card input {
+    margin-bottom: 10px;
+}
+
+.auth-card .primary {
+    width: 100%;
+}
+
+/* =========================
+   MESSAGING
+========================= */
+
+.messenger {
+    width: 100%;
+    height: calc(100vh - 108px);
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--rc-border);
+    border-radius: 14px;
+    box-shadow: var(--rc-shadow);
+}
+
+.conversation-list {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.messenger-header {
+    padding: 18px;
+    border-bottom: 1px solid var(--rc-border);
+}
+
+.chat-view {
+    position: absolute;
+    inset: 0;
+    background: #eef2f5;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-view.hidden {
+    display: none;
+}
+
+.chat-header {
+    min-height: 62px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--rc-blue);
+    color: white;
+}
+
+.chat-header strong {
+    display: block;
+}
+
+.chat-header small {
+    opacity: .85;
+}
+
+.chat-back {
+    border: 0;
+    background: transparent;
+    color: white;
+    font-size: 28px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.chat-messages .message {
+    max-width: 78%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+}
+
+.chat-messages .message.sent {
+    align-self: flex-end;
+    background: #dbeafe;
+}
+
+.chat-messages .message.received {
+    align-self: flex-start;
+    background: white;
+}
+
+.chat-messages .message small {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    opacity: .6;
+}
+
+.chat-input-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    padding: 8px;
+    background: white;
+    border-top: 1px solid var(--rc-border);
+}
+
+#messageContent {
+    flex: 1;
+    resize: none;
+    max-height: 110px;
+    border-radius: 22px;
+}
+
+.send-button {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--rc-blue);
+    color: white;
+    font-size: 19px;
+}
+
+.chat-user-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #eee;
+    background: white;
+    cursor: pointer;
+}
+
+.chat-user-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--rc-blue);
+    color: white;
+    font-weight: 800;
+}
+
+.chat-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-user-name {
+    font-weight: 700;
+}
+
+.chat-last-message {
+    color: #777;
+    font-size: 13px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Chat details */
+.chat-details-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.chat-details-box {
+    width: min(360px, 100%);
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,.25);
+}
+
+.chat-details-header {
+    padding: 22px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--rc-blue);
+    color: white;
+}
+
+.chat-details-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #5b9df9;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.chat-details-message {
+    padding: 18px;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    word-break: break-word;
+}
+
+.chat-details-action {
+    width: 100%;
+    padding: 15px 18px;
+    border: 0;
+    border-bottom: 1px solid #eee;
+    background: white;
+    text-align: left;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+.rc-mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 62px;
+    background: white;
+    border-top: 1px solid var(--rc-border);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    z-index: 2000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,.06);
+}
+
+.rc-mobile-nav button {
+    border: 0;
+    background: transparent;
+    color: #667085;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.rc-mobile-nav button span {
+    display: block;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+@media (max-width: 1100px) {
+    .rc-layout {
+        grid-template-columns: 210px minmax(400px, 1fr);
+    }
+
+    .rc-rightbar {
+        display: none;
+    }
+}
+
+@media (max-width: 760px) {
+    .rc-topbar {
+        height: 58px;
+        padding: 0 10px;
+    }
+
+    .rc-brand {
+        min-width: auto;
+    }
+
+    .rc-brand-name {
+        font-size: 18px;
+    }
+
+    .rc-logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .rc-search {
+        display: none;
+    }
+
+    .rc-top-actions {
+        gap: 4px;
+    }
+
+    .rc-top-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .rc-profile-mini span {
+        display: none;
+    }
+
+    .rc-layout {
+        display: block;
+        padding: 10px 8px 76px;
+    }
+
+    .rc-sidebar,
+    .rc-rightbar {
+        display: none;
+    }
+
+    .rc-main {
+        width: 100%;
+    }
+
+    .rc-stories {
+        border-radius: 12px;
+    }
+
+    .rc-story {
+        min-width: 90px;
+        height: 135px;
+    }
+
+    .rc-mobile-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 62px;
+        background: white;
+        border-top: 1px solid var(--rc-border);
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        z-index: 2000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,.06);
+    }
+
+    .rc-mobile-nav button {
+        border: 0;
+        background: transparent;
+        color: #667085;
+        font-size: 20px;
+    }
+
+    .rc-mobile-nav button span {
+        display: block;
+        font-size: 10px;
+        margin-top: 2px;
+    }
+
+    .messenger {
+        height: calc(100vh - 80px);
+        border-radius: 10px;
+    }
+}
+
+/* RichConnect menu */
+.rc-menu-wrap {
+    position: relative;
+    margin-left: auto;
+}
+
+.rc-menu-btn {
+    border: 0;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 6px 10px;
+    line-height: 1;
+}
+
+.rc-menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    min-width: 180px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.18);
+    padding: 8px;
+    z-index: 9999;
+}
+
+.rc-menu-dropdown button {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    padding: 11px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.rc-menu-dropdown button:hover {
+    background: #f0f2f5;
+}
+
+
+/* FORCE BOTTOM NAVIGATION */
+#appSection:not(.hidden) .rc-mobile-nav {
+    display: grid !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 64px !important;
+    z-index: 99999 !important;
+    background: #ffffff !important;
+    border-top: 1px solid #ddd !important;
+}
+
+#appSection:not(.hidden) .rc-layout {
+    padding-bottom: 80px !important;
+}
+
+#appSection:not(.hidden) .rc-mobile-nav button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+
+.rc-mobile-nav .rc-nav-icon {
+    display: block !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+    margin-bottom: 3px !important;
+}
+
+.rc-mobile-nav button span:last-child {
+    display: block !important;
+    font-size: 11px !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     AUTHENTICATION
+========================= -->
+
+<section id="authSection">
+
+    <div class="auth-wrap">
+
+        <div class="auth-brand">
+            <div class="rc-logo">R</div>
+            <h1>RichConnect</h1>
+        </div>
+
+        <div class="card auth-card">
+
+            <h2>Welcome to RichConnect</h2>
+
+            <p>
+                Connect with people, share your world and build your community.
+            </p>
+
+            <div id="loginMessage"></div>
+
+            <input
+                id="loginEmail"
+                type="email"
+                placeholder="Email">
+
+            <input
+                id="loginPassword"
+                type="password"
+                placeholder="Password">
+
+            <button
+                class="primary"
+                onclick="login()">
+                Log In
+            </button>
+
+            <p style="text-align:center;margin:15px 0 0;">
+                Don't have an account?
+            </p>
+
+            <button
+                class="secondary"
+                style="width:100%;"
+                onclick="showSignup()">
+                Create New Account
+            </button>
+
+        </div>
+
+        <div
+            id="signupCard"
+            class="card auth-card hidden"
+            style="margin-top:12px;">
+
+            <h2>Create your account</h2>
+
+            <p>Join RichConnect and start connecting.</p>
+
+            <div id="signupMessage"></div>
+
+            <input
+                id="signupName"
+                type="text"
+                placeholder="Full name">
+
+            <input
+                id="signupEmail"
+                type="email"
+                placeholder="Email">
+
+            <input
+                id="signupPassword"
+                type="password"
+                placeholder="Password">
+
+            <button
+                class="primary"
+                onclick="signup()">
+                Create Account
+            </button>
+
+            <button
+                class="secondary"
+                style="width:100%;margin-top:10px;"
+                onclick="showLogin()">
+                Back to Login
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     APPLICATION
+========================= -->
+
+<section id="appSection" class="hidden">
+
+    <!-- TOP BAR -->
+
+    <header class="rc-topbar">
+
+        <div class="rc-brand">
+            <div class="rc-brand-name">
+                RichConnect
+            </div>
+        </div>
+
+        <div class="rc-menu-wrap">
+
+            <button
+                id="menuBtn"
+                class="rc-menu-btn"
+                onclick="toggleMenu()"
+                aria-label="Open menu">
+                ☰
+            </button>
+
+            <div id="menuDropdown" class="rc-menu-dropdown hidden">
+
+    <button onclick="toggleMenu(); alert('Groups coming soon');">
+        👥 Group
+    </button>
+
+    <button onclick="toggleMenu(); alert('Pages coming soon');">
+        📄 Page
+    </button>
+
+    <button onclick="toggleMenu(); alert('Events coming soon');">
+        📅 Event
+    </button>
+
+    <button onclick="toggleMenu(); alert('Games coming soon');">
+        🎮 Games
+    </button>
+
+    <button onclick="toggleMenu(); alert('Marketplace coming soon');">
+        🛍️ Market
+    </button>
+
+    <div class="rc-menu-divider"></div>
+
+    <button onclick="toggleMenu(); alert('Settings and privacy coming soon');">
+        ⚙️ Settings and privacy
+    </button>
+
+    <button onclick="toggleMenu(); alert('Help and support coming soon');">
+        ❓ Help and support
+    </button>
+
+    <div class="rc-menu-divider"></div>
+
+    <button id="logoutBtn" onclick="logout(); toggleMenu();">
+        🚪 Logout
+    </button>
+
+</div>
+
+        </div>
+    </header>
+
+<main class="rc-main">
+
+            <!-- HOME -->
+
+            <div
+                id="homePage"
+                class="rc-page">
+
+                <!-- STORIES -->
+
+                <div class="card rc-stories">
+
+                    <div class="rc-stories-row">
+
+                        <div class="rc-story create">
+                            <div class="rc-story-cover">
+                                <div class="rc-story-plus">+</div>
+                                <strong>Create Story</strong>
+                            </div>
+                        </div>
+
+                        <div class="rc-story">
+                            <div class="rc-story-cover">
+                                <div class="rc-avatar">R</div>
+                            </div>
+                            <strong>Your Story</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CREATE POST -->
+
+                <div class="card rc-composer">
+
+                    <div class="rc-composer-top">
+
+                        <div
+                            id="composerAvatar"
+                            class="rc-avatar">
+                            R
+                        </div>
+
+                        <button
+                            class="rc-composer-trigger"
+                            onclick="document.getElementById('postContent').focus()">
+                            What's on your mind?
+                        </button>
+
+                    </div>
+
+                    <textarea
+                        id="postContent"
+                        placeholder="What's on your mind?"
+                        rows="3"></textarea>
+
+                    <div class="rc-composer-actions">
+
+                        <button class="rc-composer-option">
+                            📷 Photo
+                        </button>
+
+                        <button class="rc-composer-option">
+                            🎥 Video
+                        </button>
+
+                        <button class="rc-composer-option">
+                            😊 Feeling
+                        </button>
+
+                        <button
+                            class="rc-post-button"
+                            onclick="createPost()">
+                            Post
+                        </button>
+
+                    </div>
+
+                    <div id="postMessage"></div>
+
+                </div>
+
+
+                <!-- FEED -->
+
+                <div class="card rc-feed-card">
+
+                    <div class="rc-feed-header">
+
+                        <h2 style="font-size:18px;">
+                            Your Feed
+                        </h2>
+
+                    </div>
+
+                    <div id="feed">
+
+                        <div class="empty">
+                            Loading your feed...
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROFILE -->
+
+            <div id="profilePage" class="rc-page hidden">
+
+                <div class="rc-profile-card">
+
+                    <!-- COVER -->
+                    <div class="rc-profile-cover">
+                        <div class="rc-cover-title">RichConnect</div>
+                    </div>
+
+                    <!-- PROFILE IDENTITY -->
+                    <div class="rc-profile-identity">
+
+                        <div id="profileAvatar" class="rc-profile-avatar">
+                            R
+                        </div>
+
+                        <div class="rc-profile-main">
+
+                            <h2 id="profileName">Profile</h2>
+
+                            <p id="profileEmail" class="rc-profile-email"></p>
+
+                            <p id="profileBio" class="rc-profile-bio">
+                                Welcome to RichConnect.
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="secondary rc-edit-profile-btn"
+                            onclick="document.getElementById('profileEditBox').classList.toggle('hidden')">
+                            Edit Profile
+                        </button>
+
+                    </div>
+
+                    <!-- PROFILE NAVIGATION -->
+                    <div class="rc-profile-tabs">
+                        <button class="active">Posts</button>
+                        <button>About</button>
+                        <button>Friends</button>
+                        <button>Photos</button>
+                    </div>
+
+                    <!-- EDIT PROFILE -->
+                    <div id="profileEditBox" class="rc-profile-edit hidden">
+    <h3>Edit Profile</h3>
+
+    <div class="rc-photo-edit-grid">
+
+        <div class="rc-photo-edit-item">
+            <div class="rc-photo-edit-preview rc-avatar-edit-preview">
+                <img id="profilePhotoPreview" alt="Profile picture preview">
+                <span id="profilePhotoPlaceholder">👤</span>
+            </div>
+
+            <strong>Profile Picture</strong>
+
+            <label class="rc-upload-btn">
+                Choose Profile Picture
+                <input
+                    id="profilePhotoInput"
+                    type="file"
+                    accept="image/*"
+                    onchange="previewProfilePhoto(event)">
+            </label>
+        </div>
+
+        <div class="rc-photo-edit-item">
+            <div class="rc-photo-edit-preview rc-cover-edit-preview">
+                <img id="coverPhotoPreview" alt="Cover picture preview">
+                <span id="coverPhotoPlaceholder">🖼️</span>
+            </div>
+
+            <strong>Cover Picture</strong>
+
+            <label class="rc-upload-btn">
+                Choose Cover Picture
+                <input
+                    id="coverPhotoInput"
+                    type="file"
+                    accept="image/*"
+                    onchange="previewCoverPhoto(event)">
+            </label>
+        </div>
+
+    </div>
+
+                        <h3>Edit Profile</h3>
+
+                        <label>Name</label>
+                        <input
+                            id="profileNameInput"
+                            type="text"
+                            placeholder="Name">
+
+                        <label>Bio</label>
+                        <textarea
+                            id="profileBioInput"
+                            placeholder="Bio"></textarea>
+
+                        <button
+                            class="primary"
+                            onclick="updateProfile()">
+                            Save Profile
+                        </button>
+
+                        <div id="profileMessage"></div>
+
+                    </div>
+
+                    <!-- PROFILE CONTENT -->
+                    <div class="rc-profile-content">
+
+                        <div class="rc-profile-section">
+
+                            <h3>About</h3>
+
+                            <div class="rc-profile-info">
+                                <span class="rc-info-icon">👤</span>
+                                <div>
+                                    <strong id="profileAboutName">Profile</strong>
+                                    <small>Member of RichConnect</small>
+                                </div>
+                            </div>
+
+                            <div class="rc-profile-info">
+                                <span class="rc-info-icon">✉️</span>
+                                <div>
+                                    <strong>Email</strong>
+                                    <small id="profileAboutEmail"></small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="rc-profile-section">
+
+                            <div class="rc-profile-section-title">
+                                <h3>Posts</h3>
+                                <button
+                                    class="secondary"
+                                    onclick="showPage('home')">
+                                    Create Post
+                                </button>
+                            </div>
+
+                            <div class="rc-profile-empty">
+                                <div class="rc-profile-empty-icon">📝</div>
+                                <strong>No posts yet</strong>
+                                <span>Your posts will appear here.</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PEOPLE -->
+
+            <div
+                id="usersPage"
+                class="rc-page hidden">
+
+                <div class="card" style="padding:18px;">
+
+                    <h2>Find People</h2>
+
+                    <p style="color:#667085;margin:6px 0 15px;">
+                        Discover people and connect with them.
+                    </p>
+
+                    <input
+                        id="userSearch"
+                        type="text"
+                        placeholder="Search by name or email"
+                        oninput="searchUsers()">
+
+                    <div
+                        id="usersList"
+                        style="margin-top:12px;">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MESSAGES -->
+
+            <div
+                id="messagesPage"
+                class="rc-page hidden">
+
+                <div class="messenger">
+
+                    <div
+                        id="conversationList"
+                        class="conversation-list">
+
+                        <div class="messenger-header">
+                            <h2>Messages</h2>
+                            <p style="color:#667085;margin-top:4px;">
+                                Your conversations
+                            </p>
+                        </div>
+
+                        <div id="messagesList">
+
+                            <div class="empty">
+                                No conversations yet.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="chatView"
+                        class="chat-view hidden">
+
+                        <div class="chat-header">
+
+                            <button
+                                class="chat-back"
+                                onclick="closeChat()">
+                                ←
+                            </button>
+
+                            <div>
+
+                                <strong id="chatUserName">
+                                    Chat
+                                </strong>
+
+                                <small id="chatUserStatus">
+                                    Messenger
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="conversationResult"
+                            class="chat-messages">
+                        </div>
+
+
+                        <div class="chat-input-area">
+
+                            <textarea
+                                id="messageContent"
+                                rows="1"
+                                placeholder="Type a message..."
+                                onkeydown="handleMessageKeydown(event)">
+                            </textarea>
+
+                            <button
+                                class="send-button"
+                                onclick="sendMessage()">
+                                ➤
+                            </button>
+
+                        </div>
+
+                        <input
+                            id="messageUserId"
+                            type="hidden">
+
+                        <div id="messageResult"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- =========================
+             RIGHT SIDEBAR
+        ========================== -->
+
+        <aside class="rc-rightbar">
+
+            <div class="card rc-right-card">
+
+                <div class="rc-right-title">
+                    Contacts
+                </div>
+
+                <div class="rc-contact">
+                    <div class="rc-avatar small">J</div>
+                    <div class="rc-contact-info">
+                        
+                        <span class="rc-online">● Online</span>
+                    </div>
+                </div>
+
+                <div class="rc-contact">
+                    <div class="rc-avatar small">S</div>
+                    <div class="rc-contact-info">
+                        
+                        <small style="color:#667085;">
+                            2 mutual connections
+                        </small>
+                    </div>
+
+                    <button class="rc-add">
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <!-- MOBILE NAVIGATION -->
+    <nav class="rc-mobile-nav">
+    <button onclick="showPage('home')" aria-label="Home">
+        <span class="rc-nav-icon">🏠</span>
+        <span>Home</span>
+    </button>
+
+    <button onclick="showPage('users')" aria-label="People">
+        <span class="rc-nav-icon">👥</span>
+        <span>People</span>
+    </button>
+
+    <button onclick="showPage('home'); document.getElementById('postContent').focus()" aria-label="Create Post">
+        <span class="rc-nav-icon">＋</span>
+        <span>Post</span>
+    </button>
+
+    <button onclick="showPage('messages')" aria-label="Messages">
+        <span class="rc-nav-icon">💬</span>
+        <span>Messages</span>
+    </button>
+
+    <button onclick="showPage('profile')" aria-label="Profile">
+        <span class="rc-nav-icon">👤</span>
+        <span>Profile</span>
+    </button>
+</nav>
+
+</section>
+
+<script>
+
+const API = "/api";
+
+let currentUser = null;
+
+
+// ================================
+// HELPERS
+// ================================
+
+async function api(url, options = {}) {
+
+    const response = await fetch(API + url, {
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        },
+        ...options
+    });
+
+    let data = {};
+
+    try {
+        data = await response.json();
+    } catch (e) {
+        data = {};
+    }
+
+    if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+    }
+
+    return data;
+}
+
+
+function showMessage(elementId, text, type = "success") {
+
+    const element = document.getElementById(elementId);
+
+    element.innerHTML =
+        `<div class="message ${type}">${escapeHtml(text)}</div>`;
+}
+
+
+function escapeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text ?? "";
+
+    return div.innerHTML;
+}
+
+
+// ================================
+// AUTH
+// ================================
+
+function showSignup() {
+
+    document.getElementById("signupCard")
+        .classList.remove("hidden");
+}
+
+
+function showLogin() {
+
+    document.getElementById("signupCard")
+        .classList.add("hidden");
+}
+
+
+async function signup() {
+
+    const name =
+        document.getElementById("signupName").value.trim();
+
+    const email =
+        document.getElementById("signupEmail").value.trim();
+
+    const password =
+        document.getElementById("signupPassword").value;
+
+    if (!name || !email || !password) {
+
+        showMessage(
+            "signupMessage",
+            "Please fill in all fields.",
+            "error"
+        );
+
+        return;
+    }
+
+    try {
+
+        await api("/signup", {
+            method: "POST",
+            body: JSON.stringify({
+                name,
+                email,
+                password
+            })
+        });
+
+        showMessage(
+            "signupMessage",
+            "Account created successfully. You can now login."
+        );
+
+        document.getElementById("signupName").value = "";
+        document.getElementById("signupEmail").value = "";
+        document.getElementById("signupPassword").value = "";
+
+    } catch (error) {
+
+        showMessage(
+            "signupMessage",
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+async function login() {
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+
+        showMessage(
+            "loginMessage",
+            "Enter your email and password.",
+            "error"
+        );
+
+        return;
+    }
+
+    try {
+
+        const data = await api("/login", {
+            method: "POST",
+            body: JSON.stringify({
+                email,
+                password
+            })
+        });
+
+        currentUser = data.user;
+
+        showApp();
+
+    } catch (error) {
+
+        showMessage(
+            "loginMessage",
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+
+function toggleMenu() {
+    const menu = document.getElementById("menuDropdown");
+    if (menu) {
+        menu.classList.toggle("hidden");
+    }
+}
+
+document.addEventListener("click", function(event) {
+    const wrap = document.querySelector(".rc-menu-wrap");
+    const menu = document.getElementById("menuDropdown");
+
+    if (wrap && menu && !wrap.contains(event.target)) {
+        menu.classList.add("hidden");
+    }
+});
+
+async function logout() {
+
+    try {
+        await api("/logout", {
+            method: "POST"
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
+    currentUser = null;
+
+    document.getElementById("appSection")
+        .classList.add("hidden");
+
+    document.getElementById("authSection")
+        .classList.remove("hidden");
+
+    document.getElementById("logoutBtn")
+        .classList.add("hidden");
+}
+
+
+async function checkLogin() {
+
+    try {
+
+        const data = await api("/me");
+
+        if (data.user) {
+
+            currentUser = data.user;
+
+            showApp();
+
+        }
+
+    } catch (error) {
+
+        console.log("Not logged in");
+    }
+}
+
+
+function showApp() {
+
+    document.getElementById("authSection")
+        .classList.add("hidden");
+
+    document.getElementById("appSection")
+        .classList.remove("hidden");
+
+    document.getElementById("logoutBtn")
+        .classList.remove("hidden");
+
+    loadFeed();
+    loadProfile();
+}
+
+
+// ================================
+// PAGES
+// ================================
+
+function showPage(page) {
+
+    const pages = [
+        "homePage",
+        "profilePage",
+        "usersPage",
+        "messagesPage"
+    ];
+
+    pages.forEach(id => {
+
+        document.getElementById(id)
+            .classList.add("hidden");
+
+    });
+
+    document.getElementById(page + "Page")
+        .classList.remove("hidden");
+
+
+    if (page === "home") {
+        loadFeed();
+    }
+
+    if (page === "profile") {
+        loadProfile();
+    }
+
+    if (page === "users") {
+        searchUsers();
+    }
+
+    if (page === "messages") {
+        loadConversations();
+    }
+}
+
+
+// ================================
+// POSTS
+// ================================
+
+async function createPost() {
+
+    const content =
+        document.getElementById("postContent")
+        .value.trim();
+
+    if (!content) {
+
+        showMessage(
+            "postMessage",
+            "Write something first.",
+            "error"
+        );
+
+        return;
+    }
+
+    try {
+
+        await api("/posts", {
+            method: "POST",
+            body: JSON.stringify({
+                content
+            })
+        });
+
+        document.getElementById("postContent").value = "";
+
+        showMessage(
+            "postMessage",
+            "Post published."
+        );
+
+        loadFeed();
+
+    } catch (error) {
+
+        showMessage(
+            "postMessage",
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+async function loadFeed() {
+
+    const feed =
+        document.getElementById("feed");
+
+    feed.innerHTML =
+        `<div class="empty">Loading feed...</div>`;
+
+    try {
+
+        const data = await api("/feed");
+
+        if (!data.posts || data.posts.length === 0) {
+
+            feed.innerHTML =
+                `<div class="empty">No posts yet.</div>`;
+
+            return;
+        }
+
+        feed.innerHTML = "";
+
+        data.posts.forEach(post => {
+
+            const article =
+                document.createElement("div");
+
+            article.className = "post";
+
+            article.innerHTML = `
+
+                <div class="post-author">
+                    ${escapeHtml(post.author_name)}
+                </div>
+
+                <div class="post-date">
+                    ${escapeHtml(post.created_at)}
+                </div>
+
+                <div class="post-content">
+                    ${escapeHtml(post.content)}
+                </div>
+
+                <div class="actions">
+
+                    <button onclick="likePost(${post.id})">
+                        👍 ${post.like_count || 0}
+                    </button>
+
+                    <button onclick="loadComments(${post.id})">
+                        💬 ${post.comment_count || 0}
+                    </button>
+
+                </div>
+
+                <div id="comments-${post.id}"></div>
+
+                <div style="display:flex;gap:6px;margin-top:10px;">
+
+                    <input
+                        id="comment-input-${post.id}"
+                        placeholder="Write a comment..."
+                        style="margin:0;">
+
+                    <button
+                        class="secondary"
+                        onclick="commentPost(${post.id})">
+                        Comment
+                    </button>
+
+                </div>
+            `;
+
+            feed.appendChild(article);
+
+        });
+
+    } catch (error) {
+
+        feed.innerHTML =
+            `<div class="message error">
+                ${escapeHtml(error.message)}
+            </div>`;
+    }
+}
+
+
+async function likePost(postId) {
+
+    try {
+
+        await api(`/posts/${postId}/like`, {
+            method: "POST"
+        });
+
+        loadFeed();
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+
+
+async function commentPost(postId) {
+
+    const input =
+        document.getElementById(
+            `comment-input-${postId}`
+        );
+
+    const content = input.value.trim();
+
+    if (!content) return;
+
+    try {
+
+        await api(`/posts/${postId}/comments`, {
+            method: "POST",
+            body: JSON.stringify({
+                content
+            })
+        });
+
+        input.value = "";
+
+        loadComments(postId);
+        loadFeed();
+
+    } catch (error) {
+
+        alert(error.message);
+    }
+}
+
+
+async function loadComments(postId) {
+
+    const container =
+        document.getElementById(
+            `comments-${postId}`
+        );
+
+    if (!container) return;
+
+    try {
+
+        const data =
+            await api(`/posts/${postId}/comments`);
+
+        container.innerHTML = "";
+
+        if (!data.comments ||
+            data.comments.length === 0) {
+
+            return;
+        }
+
+        data.comments.forEach(comment => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "comment";
+
+            div.innerHTML =
+                `<strong>
+                    ${escapeHtml(comment.author_name)}
+                </strong>
+                ${escapeHtml(comment.content)}`;
+
+            container.appendChild(div);
+
+        });
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+
+
+// ================================
+// PROFILE
+// ================================
+
+
+function profileImageKey(type) {
+    if (!currentUser || !currentUser.id) return null;
+    return "richconnect_" + type + "_" + currentUser.id;
+}
+
+function previewImageFile(file, imgId, placeholderId, type) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("Please choose an image smaller than 5 MB.");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+
+        try {
+            localStorage.setItem(profileImageKey(type), imageData);
+        } catch (error) {
+            alert("The image could not be saved. Try a smaller image.");
+            return;
+        }
+
+        const img = document.getElementById(imgId);
+        const placeholder = document.getElementById(placeholderId);
+
+        if (img) {
+            img.src = imageData;
+            img.classList.add("visible");
+        }
+
+        if (placeholder) {
+            placeholder.style.display = "none";
+        }
+
+        applySavedProfileImages();
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function previewProfilePhoto(event) {
+    previewImageFile(
+        event.target.files[0],
+        "profilePhotoPreview",
+        "profilePhotoPlaceholder",
+        "profile_photo"
+    );
+}
+
+function previewCoverPhoto(event) {
+    previewImageFile(
+        event.target.files[0],
+        "coverPhotoPreview",
+        "coverPhotoPlaceholder",
+        "cover_photo"
+    );
+}
+
+function applySavedProfileImages() {
+    if (!currentUser || !currentUser.id) return;
+
+    let profilePhoto = null;
+    let coverPhoto = null;
+
+    try {
+        profilePhoto = localStorage.getItem(
+            profileImageKey("profile_photo")
+        );
+
+        coverPhoto = localStorage.getItem(
+            profileImageKey("cover_photo")
+        );
+    } catch (error) {
+        return;
+    }
+
+    const avatar = document.getElementById("profileAvatar");
+
+    if (avatar) {
+        if (profilePhoto) {
+            avatar.textContent = "";
+            avatar.style.backgroundImage =
+                'url("' + profilePhoto + '")';
+            avatar.style.backgroundSize = "cover";
+            avatar.style.backgroundPosition = "center";
+        } else {
+            avatar.style.backgroundImage = "";
+            avatar.textContent =
+                (currentUser.name || "R").charAt(0).toUpperCase();
+        }
+    }
+
+    const cover = document.querySelector(".rc-profile-cover");
+
+    if (cover) {
+        if (coverPhoto) {
+            cover.style.backgroundImage =
+                'url("' + coverPhoto + '")';
+            cover.style.backgroundSize = "cover";
+            cover.style.backgroundPosition = "center";
+        } else {
+            cover.style.backgroundImage =
+                "linear-gradient(135deg, #1877f2, #5b4de8, #8b5cf6)";
+        }
+    }
+
+    const profilePreview =
+        document.getElementById("profilePhotoPreview");
+
+    const profilePlaceholder =
+        document.getElementById("profilePhotoPlaceholder");
+
+    if (profilePreview) {
+        if (profilePhoto) {
+            profilePreview.src = profilePhoto;
+            profilePreview.classList.add("visible");
+
+            if (profilePlaceholder) {
+                profilePlaceholder.style.display = "none";
+            }
+        }
+    }
+
+    const coverPreview =
+        document.getElementById("coverPhotoPreview");
+
+    const coverPlaceholder =
+        document.getElementById("coverPhotoPlaceholder");
+
+    if (coverPreview) {
+        if (coverPhoto) {
+            coverPreview.src = coverPhoto;
+            coverPreview.classList.add("visible");
+
+            if (coverPlaceholder) {
+                coverPlaceholder.style.display = "none";
+            }
+        }
+    }
+}
+
+async function loadProfile() {
+
+    if (!currentUser) return;
+
+    try {
+
+        const data =
+            await api(`/users/${currentUser.id}`);
+
+        const user = data.user;
+
+        document.getElementById("profileName")
+            .textContent = user.name;
+
+        document.getElementById("profileEmail")
+            .textContent = user.email;
+
+        document.getElementById("profileNameInput")
+            .value = user.name || "";
+
+        document.getElementById("profileBioInput")
+            .value = user.bio || "";
+
+        document.getElementById("profileAvatar")
+            .textContent =
+            (user.name || "R").charAt(0).toUpperCase();
+
+        const bio = user.bio || "Welcome to RichConnect.";
+
+        const profileBio = document.getElementById("profileBio");
+        if (profileBio) profileBio.textContent = bio;
+
+        const aboutName = document.getElementById("profileAboutName");
+        if (aboutName) aboutName.textContent = user.name || "Profile";
+
+        const aboutEmail = document.getElementById("profileAboutEmail");
+        if (aboutEmail) aboutEmail.textContent = user.email || "";
+
+        applySavedProfileImages();
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+
+
+async function updateProfile() {
+
+    const name =
+        document.getElementById("profileNameInput")
+        .value.trim();
+
+    const bio =
+        document.getElementById("profileBioInput")
+        .value.trim();
+
+    if (!name) {
+
+        showMessage(
+            "profileMessage",
+            "Name cannot be empty.",
+            "error"
+        );
+
+        return;
+    }
+
+    try {
+
+        const data =
+            await api("/profile", {
+                method: "PUT",
+                body: JSON.stringify({
+                    name,
+                    bio
+                })
+            });
+
+        currentUser = data.user;
+
+        showMessage(
+            "profileMessage",
+            "Profile updated."
+        );
+
+        loadProfile();
+
+    } catch (error) {
+
+        showMessage(
+            "profileMessage",
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ================================
+// USERS
+// ================================
+
+async function searchUsers() {
+    const query = document.getElementById("userSearch").value.trim();
+    const list = document.getElementById("usersList");
+
+    try {
+        const data = await api(`/users?q=${encodeURIComponent(query)}`);
+
+        list.innerHTML = "";
+
+        if (!data.users || data.users.length === 0) {
+            list.innerHTML = `<div class="empty">No users found.</div>`;
+            return;
+        }
+
+        data.users.forEach(user => {
+            const div = document.createElement("div");
+            div.className = "user";
+
+            let action = "";
+
+            if (user.friend_status === "friends") {
+                action = `
+                    <button
+                        class="primary"
+                        onclick="openMessageWithUser(${user.id}, '${escapeHtml(user.name)}')">
+                        Message
+                    </button>
+                `;
+            } else if (user.friend_status === "sent") {
+                action = `
+                    <button
+                        class="secondary"
+                        onclick="cancelFriendRequest(${user.id})">
+                        Cancel Request
+                    </button>
+                `;
+            } else if (user.friend_status === "received") {
+                action = `
+                    <div class="friend-actions">
+                        <button
+                            class="primary"
+                            onclick="acceptFriendFromUser(${user.id})">
+                            Confirm
+                        </button>
+
+                        <button
+                            class="secondary"
+                            onclick="declineFriendFromUser(${user.id})">
+                            Delete
+                        </button>
+                    </div>
+                `;
+            } else {
+                action = `
+                    <div class="friend-actions">
+                        <button
+                            class="primary"
+                            onclick="addFriend(${user.id})">
+                            Add Friend
+                        </button>
+
+                        <button
+                            class="secondary"
+                            onclick="removePerson(${user.id})">
+                            Remove
+                        </button>
+                    </div>
+                `;
+            }
+
+            div.innerHTML = `
+                <div class="user-info">
+                    <div class="user-name">
+                        ${escapeHtml(user.name)}
+                    </div>
+
+                    <div class="user-email">
+                        ${escapeHtml(user.email)}
+                    </div>
+
+                    <small>User ID: ${user.id}</small>
+                </div>
+
+                ${action}
+            `;
+
+            list.appendChild(div);
+        });
+
+    } catch (error) {
+        list.innerHTML =
+            `<div class="message error">
+                ${escapeHtml(error.message)}
+            </div>`;
+    }
+}
+
+
+async function addFriend(userId) {
+    try {
+        await api(`/friends/request/${userId}`, {
+            method: "POST"
+        });
+
+        searchUsers();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+
+async function cancelFriendRequest(userId) {
+    try {
+        await api(`/friends/request/${userId}`, {
+            method: "DELETE"
+        });
+
+        searchUsers();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+
+async function acceptFriendFromUser(userId) {
+    try {
+        const data = await api("/friends/requests");
+
+        const request = data.incoming.find(
+            item => Number(item.sender_id) === Number(userId)
+        );
+
+        if (!request) {
+            alert("Friend request not found.");
+            return;
+        }
+
+        await api(
+            `/friends/requests/${request.id}/accept`,
+            { method: "POST" }
+        );
+
+        searchUsers();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+
+async function declineFriendFromUser(userId) {
+    try {
+        const data = await api("/friends/requests");
+
+        const request = data.incoming.find(
+            item => Number(item.sender_id) === Number(userId)
+        );
+
+        if (!request) {
+            alert("Friend request not found.");
+            return;
+        }
+
+        await api(
+            `/friends/requests/${request.id}/decline`,
+            { method: "POST" }
+        );
+
+        searchUsers();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+
+async function removePerson(userId) {
+    const person = document.querySelector(
+        `.user button[onclick="removePerson(${userId})"]`
+    );
+
+    if (!person) {
+        return;
+    }
+
+    const card = person.closest(".user");
+
+    if (card) {
+        card.remove();
+    }
+}
+
+
+let chatLongPressTimer = null;
+let chatLongPressTriggered = false;
+
+
+function handleChatRowClick(event, userId, userName) {
+    if (chatLongPressTriggered) {
+        event.preventDefault();
+        event.stopPropagation();
+        chatLongPressTriggered = false;
+        return;
+    }
+
+    openMessageWithUser(userId, userName);
+}
+
+
+function startChatLongPress(event, userId, userName, lastMessage) {
+    chatLongPressTriggered = false;
+
+    chatLongPressTimer = setTimeout(() => {
+        chatLongPressTriggered = true;
+
+        showChatDetails(
+            userId,
+            userName,
+            lastMessage
+        );
+    }, 600);
+}
+
+
+function cancelChatLongPress(event) {
+    if (chatLongPressTimer) {
+        clearTimeout(chatLongPressTimer);
+        chatLongPressTimer = null;
+    }
+
+    if (chatLongPressTriggered) {
+        event.preventDefault();
+        event.stopPropagation();
+        chatLongPressTriggered = false;
+    }
+}
+
+
+function showChatDetails(userId, userName, lastMessage) {
+    const existing = document.getElementById("chatDetailsOverlay");
+
+    if (existing) {
+        existing.remove();
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "chatDetailsOverlay";
+    overlay.className = "chat-details-overlay";
+
+    overlay.innerHTML = `
+        <div class="chat-details-box" onclick="event.stopPropagation()">
+            <div class="chat-details-header">
+                <div class="chat-details-avatar">
+                    ${escapeHtml((userName || "U").charAt(0).toUpperCase())}
+                </div>
+
+                <strong>${escapeHtml(userName || "User")}</strong>
+            </div>
+
+            <div class="chat-details-message">
+                ${escapeHtml(lastMessage || "No message")}
+            </div>
+
+            <button
+                class="chat-details-action"
+                onclick="closeChatDetails(); openMessageWithUser(${Number(userId)}, '${escapeHtml(userName || "User").replace(/'/g, "\\'")}')">
+                Open Chat
+            </button>
+
+            <button
+                class="chat-details-action"
+                onclick="closeChatDetails()">
+                Cancel
+            </button>
+        </div>
+    `;
+
+    overlay.onclick = closeChatDetails;
+
+    document.body.appendChild(overlay);
+}
+
+
+function closeChatDetails() {
+    const overlay = document.getElementById("chatDetailsOverlay");
+
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+
+async function loadConversations() {
+    const list = document.getElementById("messagesList");
+
+    if (!list) {
+        return;
+    }
+
+    try {
+        const data = await api("/messages");
+
+        if (!data.conversations || data.conversations.length === 0) {
+            list.innerHTML = `
+                <div class="empty">
+                    No conversations yet.
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = data.conversations.map(conversation => {
+            const name = escapeHtml(conversation.name || "User");
+            const message = escapeHtml(conversation.last_message || "");
+
+            const date = new Date(conversation.last_message_at);
+
+            const time = isNaN(date.getTime())
+                ? ""
+                : date.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+
+            const initial = escapeHtml(
+                (conversation.name || "U").charAt(0).toUpperCase()
+            );
+
+            const safeName = name.replace(/'/g, "\\'");
+
+            return `
+                <div
+                    class="chat-user-row"
+                    onclick="handleChatRowClick(event, ${conversation.user_id}, '${safeName}')"
+                    onpointerdown="startChatLongPress(event, ${conversation.user_id}, '${safeName}', '${message.replace(/'/g, "\\'")}')"
+                    onpointerup="cancelChatLongPress(event)"
+                    onpointercancel="cancelChatLongPress(event)"
+                    onpointerleave="cancelChatLongPress(event)"
+                >
+                    <div class="chat-user-avatar">
+                        ${initial}
+                    </div>
+
+                    <div class="chat-user-info">
+                        <div class="chat-user-name">
+                            ${name}
+                        </div>
+
+                        <div class="chat-last-message">
+                            ${message}
+                        </div>
+                    </div>
+
+                    <small>${time}</small>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        list.innerHTML = `
+            <div class="message error">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+    }
+}
+
+
+async function openMessageWithUser(userId, userName = "Chat") {
+    document.getElementById("messageUserId").value = userId;
+    document.getElementById("chatUserName").textContent = userName;
+    document.getElementById("chatUserStatus").textContent = "Messenger";
+
+    const list = document.getElementById("conversationList");
+    const chat = document.getElementById("chatView");
+
+    if (list) {
+        list.classList.add("hidden");
+    }
+
+    if (chat) {
+        chat.classList.remove("hidden");
+    }
+
+    if (typeof showPage === "function") {
+        showPage("messages");
+    }
+
+    await loadConversation();
+}
+
+
+function closeChat() {
+    const chat = document.getElementById("chatView");
+    const list = document.getElementById("conversationList");
+
+    if (chat) {
+        chat.classList.add("hidden");
+    }
+
+    if (list) {
+        list.classList.remove("hidden");
+    }
+
+    document.getElementById("messageUserId").value = "";
+    document.getElementById("messageContent").value = "";
+}
+
+
+function handleMessageKeydown(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
+}
+
+
+async function loadConversation() {
+    const userId = document.getElementById("messageUserId").value;
+
+    if (!userId) {
+        return;
+    }
+
+    try {
+        const data = await api(`/messages/${Number(userId)}`);
+        const box = document.getElementById("conversationResult");
+
+        if (!data.messages || data.messages.length === 0) {
+            box.innerHTML = `
+                <div class="empty">
+                    No messages yet. Say hello 👋
+                </div>
+            `;
+            return;
+        }
+
+        box.innerHTML = data.messages.map(message => {
+            const type =
+                Number(message.sender_id) === Number(currentUser.id)
+                    ? "message sent"
+                    : "message received";
+
+            const time = new Date(message.created_at);
+
+            return `
+                <div class="${type}">
+                    ${escapeHtml(message.content)}
+                    <small>${escapeHtml(
+                        isNaN(time.getTime())
+                            ? String(message.created_at)
+                            : time.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })
+                    )}</small>
+                </div>
+            `;
+        }).join("");
+
+        box.scrollTop = box.scrollHeight;
+
+    } catch (error) {
+        showMessage(
+            "conversationResult",
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+async function sendMessage() {
+    const userId =
+        document.getElementById("messageUserId").value;
+
+    const input =
+        document.getElementById("messageContent");
+
+    const content = input.value.trim();
+
+    if (!userId || !content) {
+        return;
+    }
+
+    try {
+        await api("/messages", {
+            method: "POST",
+            body: JSON.stringify({
+                receiver_id: Number(userId),
+                content
+            })
+        });
+
+        input.value = "";
+
+        await loadConversation();
+
+        input.focus();
+
+    } catch (error) {
+        showMessage(
+            "messageResult",
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+// ================================
+// START
+// ================================
+
+checkLogin();
+
+</script>
+
+<style>
+.rc-special-menu-title {
+    padding: 9px 10px 5px;
+    color: #98a2b3;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.rc-special-menu-item {
+    min-height: 58px;
+}
+
+@media (max-width: 500px) {
+    .rc-menu-dropdown {
+        width: calc(100vw - 24px) !important;
+        min-width: 0 !important;
+        right: -4px !important;
+    }
+}
+</style>
