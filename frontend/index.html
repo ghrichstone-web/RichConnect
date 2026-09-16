@@ -1501,7 +1501,146 @@ textarea:focus {
     font-size: 11px !important;
 }
 
+
+/* Unified RichConnect authentication card */
+.rc-auth-single-card {
+    overflow: hidden;
+}
+
+.rc-auth-view {
+    animation: rcAuthIn .28s ease;
+}
+
+@keyframes rcAuthIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
+
+<style>
+.auth-brand p {
+    margin: 5px 0 0;
+    color: #667085;
+}
+
+.auth-forgot {
+    display: block;
+    margin: 10px auto;
+    border: 0;
+    background: none;
+    color: #1877f2;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+    color: #98a2b3;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    height: 1px;
+    background: #eaecf0;
+    flex: 1;
+}
+
+.auth-create {
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    padding: 13px;
+    background: #36a420;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.auth-subtitle {
+    color: #667085;
+}
+
+.auth-footer {
+    max-width: 400px;
+    margin: 16px auto;
+    color: #98a2b3;
+    font-size: 12px;
+    line-height: 1.5;
+}
+</style>
+\n
+<style>
+.rc-signup-progress {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.rc-signup-progress span {
+    height: 4px;
+    flex: 1;
+    border-radius: 5px;
+    background: #e4e7ec;
+}
+
+.rc-signup-progress span.active {
+    background: #1877f2;
+}
+
+#signupCard input,
+#signupCard select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    margin-bottom: 10px;
+    border: 1px solid #d0d5dd;
+    border-radius: 9px;
+    font-size: 15px;
+    background: white;
+}
+
+.rc-phone-row {
+    display: flex;
+    gap: 8px;
+}
+
+.rc-phone-row select {
+    width: 115px !important;
+    flex-shrink: 0;
+}
+
+.rc-phone-row input {
+    flex: 1;
+}
+
+.rc-verification-hint {
+    color: #667085;
+    font-size: 13px;
+    margin: 3px 0 12px;
+}
+
+@media (max-width: 420px) {
+    .rc-phone-row {
+        display: block;
+    }
+
+    .rc-phone-row select {
+        width: 100% !important;
+    }
+}
+</style>
+
 </head>
 
 <body>
@@ -1517,87 +1656,268 @@ textarea:focus {
         <div class="auth-brand">
             <div class="rc-logo">R</div>
             <h1>RichConnect</h1>
+            <p>Connect with friends and the world around you.</p>
         </div>
 
-        <div class="card auth-card">
+        <div class="card auth-card rc-auth-single-card">
 
-            <h2>Welcome to RichConnect</h2>
+            <!-- LOGIN VIEW -->
+            <div id="loginCard" class="rc-auth-view">
 
-            <p>
-                Connect with people, share your world and build your community.
-            </p>
+                <h2>Log in to RichConnect</h2>
 
-            <div id="loginMessage"></div>
+                <div id="loginMessage"></div>
 
-            <input
-                id="loginEmail"
-                type="email"
-                placeholder="Email">
+                <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="Email address or mobile number"
+                    autocomplete="username">
 
-            <input
-                id="loginPassword"
-                type="password"
-                placeholder="Password">
+                <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="Password"
+                    autocomplete="current-password">
 
-            <button
-                class="primary"
-                onclick="login()">
-                Log In
-            </button>
+                <button
+                    class="primary"
+                    style="width:100%;font-size:16px;padding:13px;"
+                    onclick="login()">
+                    Log In
+                </button>
 
-            <p style="text-align:center;margin:15px 0 0;">
-                Don't have an account?
-            </p>
+                <button
+                    class="auth-forgot"
+                    onclick="alert('Password recovery coming next')">
+                    Forgot password?
+                </button>
 
-            <button
-                class="secondary"
-                style="width:100%;"
-                onclick="showSignup()">
-                Create New Account
-            </button>
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <button
+                    class="auth-create"
+                    onclick="showSignup()">
+                    Create New Account
+                </button>
+
+            </div>
+
+
+            <!-- REGISTRATION VIEW -->
+            <div
+                id="signupCard"
+                class="rc-auth-view hidden">
+
+                <div class="rc-signup-progress">
+                    <span class="active"></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div id="signupStep1">
+
+                    <h2>Create your account</h2>
+
+                    <p class="auth-subtitle">
+                        It's quick and easy to join RichConnect.
+                    </p>
+
+                    <div id="signupMessage"></div>
+
+                    <input
+                        id="signupName"
+                        type="text"
+                        placeholder="Full name"
+                        autocomplete="name">
+
+                    <input
+                        id="signupDob"
+                        type="date">
+
+                    <select id="signupGender">
+                        <option value="">Gender</option>
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="other">Other</option>
+                    </select>
+
+                    <button
+                        class="auth-create"
+                        onclick="signupNextStep(2)">
+                        Next
+                    </button>
+
+                </div>
+
+
+                <div id="signupStep2" class="hidden">
+
+                    <h2>How can we verify you?</h2>
+
+                    <p class="auth-subtitle">
+                        Enter your mobile number or email address. We'll send you a verification code.
+                    </p>
+
+                    <div class="rc-phone-row">
+
+                        <select id="signupCountry">
+                            <option value="+233">🇬🇭 +233</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+234">🇳🇬 +234</option>
+                            <option value="+254">🇰🇪 +254</option>
+                            <option value="+27">🇿🇦 +27</option>
+                        </select>
+
+                        <input
+                            id="signupPhone"
+                            type="tel"
+                            placeholder="Mobile number"
+                            autocomplete="tel">
+
+                    </div>
+
+                    <input
+                        id="signupEmail"
+                        type="email"
+                        placeholder="Gmail or email address"
+                        autocomplete="email"
+                        style="width:100%;box-sizing:border-box;margin-top:10px;">
+
+                    <div id="verificationMethodBox" class="hidden" style="margin-top:14px;">
+
+                        <p style="margin:0 0 8px;font-weight:600;">
+                            Where should we send your code?
+                        </p>
+
+                        <label style="display:block;margin:8px 0;">
+                            <input
+                                type="radio"
+                                name="verificationMethod"
+                                value="sms"
+                                checked>
+                            📱 Send code by SMS
+                        </label>
+
+                        <label style="display:block;margin:8px 0;">
+                            <input
+                                type="radio"
+                                name="verificationMethod"
+                                value="email">
+                            📧 Send code by Email
+                        </label>
+
+                    </div>
+
+                    <button
+                        class="auth-create"
+                        onclick="sendSignupVerification()">
+                        Send verification code
+                    </button>
+
+                    <button
+                        class="secondary"
+                        style="width:100%;margin-top:10px;"
+                        onclick="signupNextStep(1)">
+                        Back
+                    </button>
+
+                </div>
+
+
+                <div id="signupStep3" class="hidden">
+
+                    <h2>Enter your verification code</h2>
+
+                    <p class="auth-subtitle">
+                        Enter the 6-digit code sent to your mobile number.
+                    </p>
+
+                    <input
+                        id="signupCode"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="6"
+                        placeholder="6-digit code">
+
+                    <div
+                        id="verificationHint"
+                        class="rc-verification-hint">
+                    </div>
+
+                    <button
+                        class="auth-create"
+                        onclick="signupNextStep(4)">
+                        Verify number
+                    </button>
+
+                    <button
+                        class="auth-forgot"
+                        onclick="alert('SMS verification will be connected next.')">
+                        Didn't receive a code?
+                    </button>
+
+                </div>
+
+
+                <div id="signupStep4" class="hidden">
+
+                    <h2>Create your password</h2>
+
+                    <p class="auth-subtitle">
+                        Choose a strong password for your RichConnect account.
+                    </p>
+
+                    <input
+                        id="signupPassword"
+                        type="password"
+                        placeholder="New password"
+                        autocomplete="new-password">
+
+                    <input
+                        id="signupPasswordConfirm"
+                        type="password"
+                        placeholder="Confirm password"
+                        autocomplete="new-password">
+
+                    <!-- Kept for the existing signup function -->
+                    <input
+                        id="signupEmail"
+                        type="hidden">
+
+                    <button
+                        class="auth-create"
+                        onclick="finishSignup()">
+                        Create Account
+                    </button>
+
+                    <button
+                        class="secondary"
+                        style="width:100%;margin-top:10px;"
+                        onclick="signupNextStep(3)">
+                        Back
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="auth-forgot"
+                    onclick="showLogin()">
+                    Already have an account? Log in
+                </button>
+
+            </div>
 
         </div>
 
-        <div
-            id="signupCard"
-            class="card auth-card hidden"
-            style="margin-top:12px;">
-
-            <h2>Create your account</h2>
-
-            <p>Join RichConnect and start connecting.</p>
-
-            <div id="signupMessage"></div>
-
-            <input
-                id="signupName"
-                type="text"
-                placeholder="Full name">
-
-            <input
-                id="signupEmail"
-                type="email"
-                placeholder="Email">
-
-            <input
-                id="signupPassword"
-                type="password"
-                placeholder="Password">
-
-            <button
-                class="primary"
-                onclick="signup()">
-                Create Account
-            </button>
-
-            <button
-                class="secondary"
-                style="width:100%;margin-top:10px;"
-                onclick="showLogin()">
-                Back to Login
-            </button>
-
-        </div>
+        <p class="auth-footer">
+            By continuing, you agree to RichConnect's Terms, Privacy Policy and Community Standards.
+        </p>
 
     </div>
 
@@ -2207,19 +2527,331 @@ function escapeHtml(text) {
 
 function showSignup() {
 
-    document.getElementById("signupCard")
-        .classList.remove("hidden");
+    const loginCard = document.getElementById("loginCard");
+    const signupCard = document.getElementById("signupCard");
+
+    if (!loginCard || !signupCard) return;
+
+    loginCard.classList.add("hidden");
+    signupCard.classList.remove("hidden");
+
+    signupNextStep(1);
 }
 
 
 function showLogin() {
 
-    document.getElementById("signupCard")
-        .classList.add("hidden");
+    const loginCard = document.getElementById("loginCard");
+    const signupCard = document.getElementById("signupCard");
+
+    if (!loginCard || !signupCard) return;
+
+    signupCard.classList.add("hidden");
+    loginCard.classList.remove("hidden");
 }
 
 
-async function signup() {
+async function sendSignupVerification() {
+
+    const phoneInput =
+        document.getElementById("signupPhone");
+
+    const countryInput =
+        document.getElementById("signupCountry");
+
+    const emailInput =
+        document.getElementById("signupEmail");
+
+    const phone =
+        phoneInput ? phoneInput.value.trim() : "";
+
+    const country =
+        countryInput ? countryInput.value : "";
+
+    const email =
+        emailInput ? emailInput.value.trim().toLowerCase() : "";
+
+    const fullPhone =
+        phone
+            ? (phone.startsWith("+")
+                ? phone
+                : country + phone.replace(/^0+/, ""))
+            : "";
+
+    if (!fullPhone && !email) {
+        showMessage(
+            "signupMessage",
+            "Enter your mobile number or email address.",
+            "error"
+        );
+        return;
+    }
+
+    let method = "sms";
+
+    if (fullPhone && email) {
+        const selected =
+            document.querySelector(
+                'input[name="verificationMethod"]:checked'
+            );
+
+        method = selected ? selected.value : "sms";
+    } else if (email && !fullPhone) {
+        method = "email";
+    }
+
+    try {
+
+        const endpoint =
+            method === "email"
+                ? "/verification/email/send"
+                : "/verification/send";
+
+        const body =
+            method === "email"
+                ? { email }
+                : { phone_number: fullPhone };
+
+        const response = await api(endpoint, {
+            method: "POST",
+            body: JSON.stringify(body)
+        });
+
+        if (method === "email") {
+            window.signupVerificationTarget = email;
+            window.signupVerificationMethod = "email";
+        } else {
+            window.signupVerificationTarget = fullPhone;
+            window.signupVerificationMethod = "sms";
+        }
+
+        const hint =
+            document.getElementById("verificationHint");
+
+        if (hint) {
+            hint.textContent =
+                method === "email"
+                    ? "Enter the 6-digit code sent to your email."
+                    : "Enter the 6-digit code sent to your phone.";
+        }
+
+        signupNextStep(3);
+
+    } catch (error) {
+
+        showMessage(
+            "signupMessage",
+            error.message || "Unable to send verification code.",
+            "error"
+        );
+    }
+}
+
+
+function signupNextStep(step) {
+
+    for (let i = 1; i <= 4; i++) {
+
+        const section =
+            document.getElementById("signupStep" + i);
+
+        if (section) {
+            section.classList.toggle("hidden", i !== step);
+        }
+    }
+
+    const bars =
+        document.querySelectorAll(".rc-signup-progress span");
+
+    bars.forEach((bar, index) => {
+        bar.classList.toggle("active", index < step);
+    });
+
+    if (step === 3) {
+
+        const hint =
+            document.getElementById("verificationHint");
+
+        if (hint) {
+            hint.textContent =
+                "Enter the 6-digit verification code sent to you.";
+        }
+    }
+}
+
+
+async function finishSignup() {
+
+    const password =
+        document.getElementById("signupPassword").value;
+
+    const confirm =
+        document.getElementById("signupPasswordConfirm").value;
+
+    const code =
+        document.getElementById("signupCode").value.trim();
+
+    const email =
+        document.getElementById("signupEmail").value.trim().toLowerCase();
+
+    const phone =
+        document.getElementById("signupPhone").value.trim();
+
+    if (!code || !/^\\d{6}$/.test(code)) {
+
+        showMessage(
+            "signupMessage",
+            "Enter the 6-digit verification code.",
+            "error"
+        );
+
+        signupNextStep(3);
+        return;
+    }
+
+    if (!password || password.length < 6) {
+
+        showMessage(
+            "signupMessage",
+            "Password must be at least 6 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (password !== confirm) {
+
+        showMessage(
+            "signupMessage",
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+    }
+
+    const method =
+        window.signupVerificationMethod || "";
+
+    const target =
+        window.signupVerificationTarget || "";
+
+    if (method === "email") {
+
+        if (!email || target !== email) {
+
+            showMessage(
+                "signupMessage",
+                "Please verify the email address you selected.",
+                "error"
+            );
+
+            signupNextStep(2);
+            return;
+        }
+
+    } else if (method === "sms") {
+
+        if (!phone || target !== phone) {
+
+            showMessage(
+                "signupMessage",
+                "Please verify the mobile number you selected.",
+                "error"
+            );
+
+            signupNextStep(2);
+            return;
+        }
+
+    } else {
+
+        showMessage(
+            "signupMessage",
+            "Please choose email or SMS verification first.",
+            "error"
+        );
+
+        signupNextStep(2);
+        return;
+    }
+
+    try {
+
+        const verificationPayload =
+            method === "email"
+                ? {
+                    email: email,
+                    code: code
+                }
+                : {
+                    phone_number: phone,
+                    code: code
+                };
+
+        const verificationResponse =
+            await api("/verification/check", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(verificationPayload)
+            });
+
+        if (!verificationResponse.ok) {
+
+            const errorData =
+                await verificationResponse.json().catch(() => ({}));
+
+            showMessage(
+                "signupMessage",
+                errorData.error ||
+                "Invalid or expired verification code.",
+                "error"
+            );
+
+            signupNextStep(3);
+            return;
+        }
+
+        const verificationData =
+            await verificationResponse.json();
+
+        if (!verificationData.verified) {
+
+            showMessage(
+                "signupMessage",
+                "Verification failed. Please try again.",
+                "error"
+            );
+
+            signupNextStep(3);
+            return;
+        }
+
+        showMessage(
+            "signupMessage",
+            "Verification successful. Creating your account...",
+            "success"
+        );
+
+        signup(phone);
+
+    } catch (error) {
+
+        console.error("Verification error:", error);
+
+        showMessage(
+            "signupMessage",
+            "Unable to verify the code. Please try again.",
+            "error"
+        );
+    }
+}
+
+
+async function signup(phoneOverride = "") {
 
     const name =
         document.getElementById("signupName").value.trim();
@@ -2227,14 +2859,18 @@ async function signup() {
     const email =
         document.getElementById("signupEmail").value.trim();
 
+    const phone =
+        phoneOverride ||
+        document.getElementById("signupPhone").value.trim();
+
     const password =
         document.getElementById("signupPassword").value;
 
-    if (!name || !email || !password) {
+    if (!name || !phone || !password) {
 
         showMessage(
             "signupMessage",
-            "Please fill in all fields.",
+            "Please enter your name, mobile number and password.",
             "error"
         );
 
@@ -2247,7 +2883,8 @@ async function signup() {
             method: "POST",
             body: JSON.stringify({
                 name,
-                email,
+                email: email || null,
+                phone_number: phone,
                 password
             })
         });

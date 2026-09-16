@@ -1,16 +1,35 @@
 import os
+import secrets
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Flask, jsonify, request, session, send_from_directory
 import psycopg
 from psycopg.rows import dict_row
 from werkzeug.security import generate_password_hash, check_password_hash
+from twilio.rest import Client
+import resend
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR)
 app.secret_key = os.environ["SECRET_KEY"]
+
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
+TWILIO_VERIFY_SERVICE_SID = os.environ.get("TWILIO_VERIFY_SERVICE_SID")
+
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+RESEND_FROM_EMAIL = os.environ.get(
+    "RESEND_FROM_EMAIL",
+    "onboarding@resend.dev"
+)
+twilio_client = Client(
+    TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN
+) if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN else None
 
 DATABASE_URL = os.environ.get(
     "DATABASE_URL",
@@ -55,17 +74,245 @@ def health():
         }), 500
 
 
+@app.post("/api/verification/send")
+def send_verification():
+    data = request.get_json() or {}
+
+    phone_number = (
+        data.get("phone_number")
+        or data.get("phone")
+        or ""
+    ).strip()
+
+    if not phone_number:
+        return jsonify({
+            "error": "Phone number is required"
+        }), 400
+
+    if not TWILIO_VERIFY_SERVICE_SID or not twilio_client:
+        return jsonify({
+            "error": "SMS verification is not configured"
+        }), 503
+
+    try:
+        verification = twilio_client.verify.v2.services(
+            TWILIO_VERIFY_SERVICE_SID
+        ).verifications.create(
+            to=phone_number,
+            channel="sms"
+        )
+
+        return jsonify({
+            "message": "Verification code sent",
+            "status": verification.status
+        }), 200
+
+    except Exception as e:
+        app.logger.exception("Failed to send verification SMS")
+        return jsonify({
+            "error": "Unable to send verification code",
+            "details": str(e)
+        }), 502
+
+
+
+@app.post("/api/verification/email/send")
+def send_email_verification():
+    data = request.get_json() or {}
+
+    email = (data.get("email") or "").strip().lower()
+
+    if not email:
+        return jsonify({
+            "error": "Email address is required"
+        }), 400
+
+    if not RESEND_API_KEY:
+        return jsonify({
+            "error": "Email verification is not configured"
+        }), 503
+
+    code = f"{secrets.randbelow(1000000):06d}"
+    code_hash = generate_password_hash(code)
+    expires_at = datetime.utcnow() + timedelta(minutes=10)
+
+    try:
+        resend.api_key = RESEND_API_KEY
+
+        resend.Emails.send({
+            "from": RESEND_FROM_EMAIL,
+            "to": [email],
+            "subject": "Your RichConnect verification code",
+            "html": f"""
+                <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;">
+                    <h2>Verify your RichConnect account</h2>
+                    <p>Your verification code is:</p>
+                    <div style="font-size:32px;font-weight:bold;letter-spacing:8px;">
+                        {code}
+                    </div>
+                    <p>This code expires in 10 minutes.</p>
+                    <p>If you did not request this code, you can ignore this email.</p>
+                </div>
+            """
+        })
+
+        with get_db() as conn:
+            conn.execute(
+                "DELETE FROM email_verifications WHERE email = %s",
+                (email,)
+            )
+            conn.execute(
+                """
+                INSERT INTO email_verifications
+                    (email, code_hash, expires_at)
+                VALUES
+                    (%s, %s, %s)
+                """,
+                (email, code_hash, expires_at)
+            )
+
+        return jsonify({
+            "message": "Verification code sent"
+        }), 200
+
+    except Exception:
+        app.logger.exception("Failed to send verification email")
+        return jsonify({
+            "error": "Unable to send verification email"
+        }), 502
+
+
+@app.post("/api/verification/check")
+def check_verification():
+    data = request.get_json() or {}
+
+    phone_number = (
+        data.get("phone_number")
+        or data.get("phone")
+        or ""
+    ).strip()
+
+    email = (data.get("email") or "").strip().lower()
+    code = str(data.get("code") or "").strip()
+
+    if not code or (not phone_number and not email):
+        return jsonify({
+            "error": "Email or phone number and verification code are required"
+        }), 400
+
+    # SMS verification through Twilio
+    if phone_number:
+        if not TWILIO_VERIFY_SERVICE_SID or not twilio_client:
+            return jsonify({
+                "error": "SMS verification is not configured"
+            }), 503
+
+        try:
+            verification_check = twilio_client.verify.v2.services(
+                TWILIO_VERIFY_SERVICE_SID
+            ).verification_checks.create(
+                to=phone_number,
+                code=code
+            )
+
+            if verification_check.status == "approved":
+                session["verified_phone"] = phone_number
+
+                return jsonify({
+                    "message": "Phone number verified",
+                    "verified": True,
+                    "method": "sms"
+                }), 200
+
+            return jsonify({
+                "error": "Invalid or expired verification code",
+                "verified": False
+            }), 400
+
+        except Exception:
+            app.logger.exception("Failed to verify SMS code")
+            return jsonify({
+                "error": "Unable to verify code"
+            }), 502
+
+    # Email verification through Resend
+    try:
+        with get_db() as conn:
+            verification = conn.execute(
+                """
+                SELECT id, code_hash, expires_at
+                FROM email_verifications
+                WHERE email = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+                """,
+                (email,)
+            ).fetchone()
+
+            if not verification:
+                return jsonify({
+                    "error": "No verification code found",
+                    "verified": False
+                }), 400
+
+            if datetime.utcnow() > verification["expires_at"]:
+                conn.execute(
+                    "DELETE FROM email_verifications WHERE email = %s",
+                    (email,)
+                )
+
+                return jsonify({
+                    "error": "Verification code expired",
+                    "verified": False
+                }), 400
+
+            if not check_password_hash(
+                verification["code_hash"],
+                code
+            ):
+                return jsonify({
+                    "error": "Invalid verification code",
+                    "verified": False
+                }), 400
+
+            conn.execute(
+                "DELETE FROM email_verifications WHERE email = %s",
+                (email,)
+            )
+
+        session["verified_email"] = email
+
+        return jsonify({
+            "message": "Email address verified",
+            "verified": True,
+            "method": "email"
+        }), 200
+
+    except Exception:
+        app.logger.exception("Failed to verify email code")
+        return jsonify({
+            "error": "Unable to verify email code"
+        }), 502
+
+
 @app.post("/api/signup")
 def signup():
     data = request.get_json() or {}
 
     name = data.get("name", "").strip()
-    email = data.get("email", "").strip().lower()
+    email = (data.get("email") or "").strip().lower() or None
+    phone_number = (
+        data.get("phone_number")
+        or data.get("phone")
+        or ""
+    ).strip()
     password = data.get("password", "")
 
-    if not name or not email or not password:
+    # The new registration flow uses a phone number.
+    # Keep email optional for phone-based accounts.
+    if not name or not phone_number or not password:
         return jsonify({
-            "error": "Name, email and password are required"
+            "error": "Name, phone number and password are required"
         }), 400
 
     if len(password) < 6:
@@ -73,17 +320,43 @@ def signup():
             "error": "Password must be at least 6 characters"
         }), 400
 
+    verified_email = session.get("verified_email")
+    verified_phone = session.get("verified_phone")
+
+    email_verified = bool(
+        email and verified_email and email == verified_email
+    )
+
+    phone_verified = bool(
+        phone_number and verified_phone and phone_number == verified_phone
+    )
+
+    if not email_verified and not phone_verified:
+        return jsonify({
+            "error": "Please verify your email address or phone number before creating your account"
+        }), 403
+
     password_hash = generate_password_hash(password)
 
     try:
         with get_db() as conn:
             user = conn.execute(
                 """
-                INSERT INTO users (name, email, password_hash)
-                VALUES (%s, %s, %s)
-                RETURNING id, name, email, bio, avatar_url, created_at
+                INSERT INTO users
+                    (name, email, phone_number, phone_verified, password_hash)
+                VALUES
+                    (%s, %s, %s, %s, %s)
+                RETURNING
+                    id, name, email, phone_number, phone_verified,
+                    bio, avatar_url, created_at
                 """,
-                (name, email, password_hash)
+                (
+                    name,
+                    email,
+                    phone_number,
+                    phone_verified,
+                    password_hash
+                )
             ).fetchone()
 
         session["user_id"] = user["id"]
@@ -93,7 +366,12 @@ def signup():
             "user": user
         }), 201
 
-    except psycopg.errors.UniqueViolation:
+    except psycopg.errors.UniqueViolation as e:
+        if "phone" in str(e).lower():
+            return jsonify({
+                "error": "Phone number already registered"
+            }), 409
+
         return jsonify({
             "error": "Email already registered"
         }), 409
@@ -103,17 +381,36 @@ def signup():
 def login():
     data = request.get_json() or {}
 
-    email = data.get("email", "").strip().lower()
+    identifier = data.get("email", "").strip()
     password = data.get("password", "")
+
+    if "@" in identifier:
+        email = identifier.lower()
+        phone_number = None
+    else:
+        email = None
+        phone_number = identifier
 
     with get_db() as conn:
         user = conn.execute(
             """
-            SELECT id, name, email, password_hash, bio, avatar_url, created_at
+            SELECT
+                id,
+                name,
+                email,
+                phone_number,
+                phone_verified,
+                password_hash,
+                bio,
+                avatar_url,
+                created_at
             FROM users
-            WHERE email = %s
+            WHERE
+                (%s::text IS NOT NULL AND email = %s)
+                OR
+                (%s::text IS NOT NULL AND phone_number = %s)
             """,
-            (email,)
+            (email, email, phone_number, phone_number)
         ).fetchone()
 
     if not user or not check_password_hash(
@@ -124,6 +421,12 @@ def login():
         }), 401
 
     session["user_id"] = user["id"]
+
+    with get_db() as conn:
+        conn.execute(
+            "UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = %s",
+            (user["id"],)
+        )
 
     user.pop("password_hash", None)
 
@@ -148,6 +451,11 @@ def me():
     user_id = session["user_id"]
 
     with get_db() as conn:
+        conn.execute(
+            "UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = %s",
+            (user_id,)
+        )
+
         user = conn.execute(
             """
             SELECT id, name, email, bio, avatar_url, created_at
